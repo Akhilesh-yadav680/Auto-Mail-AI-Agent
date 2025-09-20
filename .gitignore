@@ -1,5 +1,20 @@
-# Object file
-*.o
+# Node modules
+node_modules/
 
-# Ada Library Information
-*.ali
+# Workflow export files
+*.json
+
+# Environment files
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# IDE specific files
+.vscode/
+.idea/
