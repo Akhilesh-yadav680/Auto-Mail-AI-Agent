@@ -1,0 +1,232 @@
+{
+  "name": "Auto Mail",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "457b79aa-a993-4ea3-a725-18a6ed014bd4",
+      "name": "When chat message received",
+      "webhookId": "b8e38189-4697-42b6-9048-ed39706070b1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=Overview\nThis AI Agent is a friendly, helpful assistant that sends emails based on user queries. It understands user intent, retrieves contact details like email and phone from a dedicated \"Data\" tool, composes the message, and uses a \"Send Email\" tool to deliver it. The AI always signs off emails with \"M. Akhilesh Yadav\" for professional personalization.\n\nContext\nIn many automation scenarios, user queries require dynamically fetching contacts’ information (email, phone) from an internal database or external service. Integrating a \"Data\" retrieval node enables the AI agent to fetch such info on demand and craft personalized, accurate emails without manual input. This setup is ideal for workflow automation platforms like n8n where AI chat tools interact with business apps.\n\nInstructions\nReceive User Query: Wait for incoming messages from users requesting to send emails.\n\nExtract Intent & Details: Parse the email's main details (subject, message content) and identify the contact requested.\n\nRetrieve Contact Data: Use the \"Data\" tool to fetch recipient email, phone number, or other relevant contact details by querying internal datasets or APIs.\n\nCombine Details: Compose the email using retrieved data and user-provided message.\n\nAdd Sign-off: Append \"Best regards, M. Akhilesh Yadav\" automatically at the end of the email body.\n\nSend Email: Pass all data (To, Subject, Message) into the \"Send Email\" tool configured with Gmail or similar.\n\nError Handling: If any required field (especially email address) is missing, prompt the user for missing info before sending.\n\nTools\nAI Agent Node: Understands user input, processes natural language, and orchestrates actions.\n\nData Retrieval Tool: Queries a contact database or external source to fetch email, phone, and contact info.\n\nSend Email Tool: Handles sending emails via Gmail or another SMTP provider.\n\nMemory/State Nodes: Optionally stores session-specific data for conversation context.\n\nValidation Module: Ensures required email fields are present and correctly formatted.\n\nExample Interaction\nUser: \"Send a meeting invite to John Doe.\"\n\nAI: Uses \"Data\" tool to query contacts, finds John's email \"john.doe@example.com\".\n\nAI: \"What is the subject and message content?\"\n\nUser: \"Subject: Project Update. Message: The meeting is scheduled for Monday 10 AM.\"\n\nAI: Sends email to john.doe@example.com with the given subject and message plus sign-off.\n\nEmail body ends with:\n\"Best regards,\nM. Akhilesh Yadav\"\n\nStandard Operating Procedure (SOP)\nSet up the \"Data\" tool integration with your contact source (database, API).\n\nConfigure AI Agent to receive and interpret user messages with entity extraction.\n\nConnect AI Agent output to the \"Data\" retrieval step to fetch contact details.\n\nPass retrieved contact details and user message content to the \"Send Email\" tool.\n\nAppend a formal sign-off \"M. Akhilesh Yadav\" in the email message before sending.\n\nImplement validation to check all fields and prompt user if info is incomplete.\n\nTest end-to-end flows with sample queries to ensure accurate sending.\n\nMonitor workflow executions for errors and refine prompts and error handling iteratively.\n\nFinal Notes\nLeveraging a dedicated \"Data\" tool for contact retrieval significantly enhances the AI assistant’s accuracy and usability.\n\nAutomated signing off email ensures consistent professional identity.\n\nWell-structured error handling avoids incomplete emails and improves user experience.\n\nKeep credentials secure and update prompts for better natural language understanding over time."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "dad24301-7d76-4a74-8cf0-b45e7bb657cf",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        208
+      ],
+      "id": "4e43bfad-6e25-4616-964f-acdfa599bb10",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Z8Tl6wRWIZDzZKXl",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "baf909b9-7e04-46a4-83f7-0ce91e58f94d",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "35b9b922-d589-4504-86bd-861ebdca7456",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        0
+      ],
+      "id": "2d13bcc2-776d-45ce-8198-1d76e675415c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI(\"emailRecipient\") }}",
+        "subject": "={{ $fromAI(\"subject\") }}",
+        "emailType": "text",
+        "message": "={{ $fromAI(\"emailBody\") }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        496,
+        224
+      ],
+      "id": "b63b16a4-a41c-478f-bb12-7603ce4292c6",
+      "name": "Send a message in Gmail",
+      "webhookId": "833515fd-749d-437a-887d-dc5155c86a8c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "d7YuVDlTOeoFmxDR",
+          "name": "Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1dLVhJZRlgsCQmwKAvUoeZSxVuNjP-sO5oL-LDPoA68w",
+          "mode": "list",
+          "cachedResultName": "Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dLVhJZRlgsCQmwKAvUoeZSxVuNjP-sO5oL-LDPoA68w/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dLVhJZRlgsCQmwKAvUoeZSxVuNjP-sO5oL-LDPoA68w/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        368,
+        208
+      ],
+      "id": "6a581cca-2f99-4ea4-81f2-ab28aaebd15c",
+      "name": "Contact Database",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "iUnO0nwfONT6po1T",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact Database": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2d6b2d60-b052-4eb1-b4fb-ca923a17bdb3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2143bbab0046a29ff233d0225fd33fbe065863ee6490e9e4402496708a049faa"
+  },
+  "id": "OktTedk760odEsSY",
+  "tags": []
+}
