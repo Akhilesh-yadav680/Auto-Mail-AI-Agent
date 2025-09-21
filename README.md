@@ -1,7 +1,7 @@
 # Auto-Mail AI Agent
 
 ## Project Description
-Auto-Mail AI Agent is an intelligent email assistant built with n8n that automates sending personalized emails based on natural language user queries. It retrieves contact details dynamically via a data tool, composes customized messages, and sends emails through Gmail, concluding with a professional sign-off by M. Akhilesh Yadav. This seamless automation enhances communication and productivity.
+Auto-Mail AI Agent is an intelligent email assistant built with n8n that automates sending personalized emails based on natural language user queries. It retrieves contact details dynamically via a data tool, composes customized messages, and sends emails through Gmail, concluding with a professional sign-off by [Nmae}. This seamless automation enhances communication and productivity.
 
 ## Features
 - AI-driven understanding of user email requests
